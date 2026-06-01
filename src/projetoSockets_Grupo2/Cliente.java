@@ -1,4 +1,3 @@
-package Redes;
 package projetoSockets_Grupo2;
 
 import java.io.BufferedReader;

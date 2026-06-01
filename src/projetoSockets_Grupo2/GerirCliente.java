@@ -1,7 +1,6 @@
 package projetoSockets_Grupo2;
-import java.util.concurrent.ConcurrentHashMap;
 
-import ProjSockets_Grupo3.Atendente;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class GerirCliente {
 	private static ConcurrentHashMap<String, Atendente> clientes = new ConcurrentHashMap<>();
