@@ -28,6 +28,11 @@ public class Servidor {
 			//loop principal - aceitar clientes TCP
 			while(true) {
 				Socket socket = serverSocket.accept();
+//--- TIMEOUT ---
+// se o cliente nao enviar nada durante 3 minutos (180000 ms), desliga automaticamente
+// sem isto o servidor ficaria bloqueado para sempre à espera do cliente
+				socket.setSoTimeout(180000);
+				
 				Logger.log("Novo cliente ligado");
 				Atendente client = new Atendente(socket);
 				new Thread(client).start();
