@@ -1,4 +1,4 @@
-package projetoSockets_Grupo2;
+package server;
 
 import java.io.BufferedReader; //lê texto de forma eficiente usando um buffer de memória.
 import java.io.DataInputStream; //lê dados binários e tipos primitivos (int, double, boolean etc.) de um fluxo de entrada.

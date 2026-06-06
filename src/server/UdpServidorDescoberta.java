@@ -1,4 +1,4 @@
-package projetoSockets_Grupo2;
+package server;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;

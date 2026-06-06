@@ -1,4 +1,4 @@
-package projetoSockets_Grupo2;
+package client;
 import java.io.BufferedReader;
 
 public class ThreadRecetor implements Runnable {
