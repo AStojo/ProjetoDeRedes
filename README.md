@@ -48,7 +48,7 @@
 
 ---
 
-## 📐 4. Arquitetura do Sistema (Planeada)
+## 📐 4. Arquitetura do Sistema
 
 ```
 📦 ProjetoSockets_Grupo02/
@@ -68,81 +68,93 @@
 │   ├── 📄 relatorio.pdf
 │   └── 📄 protocolo.md
 ├── 📄 README.md
-└── 📄 run.bat / run.sh
+└── 📄 run.bat
 ```
 
 ---
 
-## 🔌 5. Portas Planeadas
+## 🔌 5. Portas Usadas
 
-| Serviço | Protocolo | Porta (default) |
+| Serviço | Protocolo | Porta |
 |---|---|---|
-| Servidor principal | TCP | `5000` |
-| UDP Ping / Discover | UDP | `5001` |
-
-> ⚠️ Poderá ser introduzido, nos argumentos de arranque, outras portas alterativas conforme escolha do utilizador.
+| Servidor principal | TCP | `Definida pelo utilizador ao iniciar` (ex: `5000`) |
+| Descoberta de Servidor | UDP | `6000` |
 
 ---
 
-## 💬 6. Protocolo de Comunicação (Planeado)
+## 🚀 6. Como Compilar e Executar
 
-### Comandos Disponíveis
+### Como Compilar
+O projeto pode ser compilado no Eclipse IDE (importando o projeto inteiro) ou através da linha de comandos na raiz do projeto:
+```bash
+javac -d bin src/server/*.java src/client/*.java src/udp/*.java
+```
+
+### Como Executar o Servidor
+Para iniciar o servidor (em ambiente Windows), execute o ficheiro de automação `run.bat` presente na raiz do projeto, ou inicie via terminal:
+```bash
+cd bin
+java server.Servidor
+```
+O servidor irá pedir no terminal que indique a **porta TCP** a ser utilizada. O serviço secundário de descoberta (UDP) inicia automaticamente, em background, na porta 6000.
+
+### Como Executar o Cliente
+Para executar o cliente principal (TCP), abra um novo terminal na pasta `bin` e execute:
+```bash
+java client.Cliente
+```
+Serão pedidos o endereço do host (ex: `127.0.0.1`) e a porta TCP(ex: `5000`) especificada durante o arranque do servidor.
+
+---
+
+## 💬 7. Protocolo de Comunicação e Comandos
+
+Após estabelecer a ligação e inserir um nome de utilizador válido, o cliente tem os seguintes comandos ao dispor:
 
 | Comando | Descrição | Exemplo |
 |---|---|---|
-| `NICK <nome>` | Regista o utilizador no servidor | `NICK ana` |
 | `HELP` | Lista os comandos disponíveis | `HELP` |
-| `WHO` | Lista os utilizadores ativos | `WHO` |
+| `WHO` | Lista todos os utilizadores ativos e logados | `WHO` |
 | `MSG <texto>` | Envia mensagem pública para todos | `MSG bom dia a todos` |
 | `PM <nick> <texto>` | Envia mensagem privada | `PM joao ola` |
-| `SEND <ficheiro>` | Envia ficheiro para o servidor | `SEND teste.txt` |
-| `PING` / `DISCOVER` | Funcionalidade UDP | `PING` |
-| `QUIT` | Termina a sessão | `QUIT` |
-
-### 📟 Códigos de Resposta
-
-| Código | Significado |
-|---|---|
-| `200` | Operação realizada com sucesso |
-| `400` | Pedido inválido |
-| `401` | Cliente ainda não registado |
-| `404` | Recurso ou utilizador não encontrado |
-| `408` | Timeout |
-| `409` | Conflito (ex: nome já utilizado) |
-| `500` | Erro interno do servidor |
+| `SEND <ficheiro>` | Envia ficheiro para o servidor | `SEND foto.jpg` |
+| `QUIT` | Termina a sessão e desliga do servidor | `QUIT` |
 
 ---
 
-## 📁 7. Transferência de Ficheiros (Planeada)
+## 🧪 8. Como Testar Funcionalidades Específicas
 
-O cliente poderá enviar ficheiros para o servidor com o comando `SEND`.
+### Como Testar a Funcionalidade UDP (Descoberta do Servidor)
+O grupo implementou a **Descoberta UDP do Servidor**. Para testar:
+1. Certifique-se de que o Servidor está em execução.
+2. Num terminal na pasta `bin`, execute a classe do cliente UDP:
+   ```bash
+   java udp.UdpClienteDescoberta
+   ```
+3. O cliente UDP enviará uma mensagem de broadcast `DISCOVER` para a rede.
+4. O servidor interceptará a mensagem na porta 6000 e responderá com o seu endereço IP e a porta TCP standard (ex: 5000), devolvendo no formato: `SERVER 192.168.1.100 5000`.
 
-**Protocolo de transferência (framing binário):**
-```
-[int nameLen][nameBytes UTF-8][long fileLen][fileBytes]
-```
-
-**Validações previstas no servidor:**
-- Tamanho máximo por ficheiro: **5 MB**
-- Rejeitar nomes inválidos e tentativas de path traversal (ex: `../../ficheiro.txt`)
-- Rejeitar ficheiros vazios
-- Tratar fim inesperado de ligação
-
----
-
-## 📡 8. Funcionalidade UDP (Planeada)
-
-> ⚠️ **O grupo ainda está a decidir entre as duas opções. A secção será atualizada quando a decisão for tomada.**
-
-### Opção A — UDP Ping
-O cliente enviará vários pacotes `PING` e receberá `PONG`, calculando estatísticas de RTT (mínimo, médio, máximo) e percentagem de perdas.
-
-### Opção B — Descoberta UDP do Servidor
-O cliente enviará `DISCOVER` em broadcast e o servidor responderá com o seu endereço e porta. Inclui timeout controlado caso não haja resposta.
+### Como Testar o Envio de Ficheiros
+1. Com o `Cliente` a correr e conectado ao servidor, assegure-se de que possui um ficheiro local válido (ex: `teste.txt`) na mesma pasta a partir de onde executou o cliente (ou insira o caminho completo).
+2. Utilize o comando `SEND`:
+   ```text
+   SEND teste.txt
+   ```
+3. O servidor processa o envio através do protocolo de framing binário e, sendo bem-sucedido, o ficheiro ficará guardado na diretoria `/uploads/` do lado do servidor.
 
 ---
 
-## 📜 9. Regras de Nomenclatura (GitHub)
+## ⚠️ 9. Limitações Conhecidas
+Durante o desenvolvimento do programa depará-mos nos com algumas restrições, sendo elas:
+- **Tamanho Limite de Ficheiros:** A transferência está limitada a ficheiros com um tamanho máximo de **5 MB**. Ficheiros de tamanho zero (vazios) também não são aceites.
+- **Segurança de Nomenclatura:** Para prevenir vulnerabilidades do tipo _Path Traversal_, nomes de ficheiros que contenham os carateres `..`, `/` ou `\` não são permitidos no comando `SEND`.
+- **Registo de Utilizador:** O nome (Username) deve ter obrigatoriamente entre 3 e 20 carateres, não aceitando os mesmos tal como não são admitidos nomes duplicados na mesma sessão.
+- **Timeout Inatividade:** O socket de cliente está configurado com um limite de inatividade de 30 minutos, de forma a conseguir fazer os testes sem a preocupação do tempo. Findo esse tempo, a conexão é encerrada automaticamente.
+- **UDP Timeout:** Ao procurar um servidor na rede, o cliente de descoberta UDP aguardará por uma resposta num limite máximo de 3 segundos antes de abortar a operação.
+
+---
+
+## 📜 10. Regras de Nomenclatura (GitHub)
 
 > 🌿 **Relativamente à nomeação de branches:**
 - Procurar seguir o formato nome_branch;
@@ -173,7 +185,7 @@ Ana_branch
 
 ---
 
-## 📜 10. Licença
+## 📜 11. Licença
 
 Projeto académico desenvolvido no âmbito da Universidade Portucalense.  
 Uso restrito — não autorizado para fins comerciais ou reprodução sem permissão dos autores.
