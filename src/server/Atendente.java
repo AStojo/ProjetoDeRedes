@@ -1,77 +1,85 @@
 package server;
 
-import java.io.BufferedReader; //lê texto de forma eficiente usando um buffer de memória.
-import java.io.DataInputStream; //lê dados binários e tipos primitivos (int, double, boolean etc.) de um fluxo de entrada.
-import java.io.File;//representa um arquivo ou diretório e permite manipular suas informações.
-import java.io.FileOutputStream;//grava bytes diretamente em um arquivo.
-import java.io.InputStreamReader; //converte bytes de uma entrada em caracteres de texto.
-import java.io.PrintWriter; //escreve texto formatado em arquivos, streams ou conexões de rede.
-import java.net.Socket; //cria e gerencia uma conexão TCP entre um cliente e um servidor.
-
-//---NOVO - IMPORT---
-// importar SocketTimeoutException para tratar o timeout separadamente
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.net.SocketTimeoutException;
 
 public class Atendente implements Runnable {
-	/**
-	 * Runnable é uma interface do Java que indica que a classe possui uma tarefa que pode ser executada por
-	 * uma thread (linha de execução).
-     * A interface exige a implementação do método: PUBLIC VOID RUN()
-     * 
-     * Quando start() é chamado, a thread executa automaticamente o método run().
-     * Objetivo: permitir que vários clientes sejam atendidos simultaneamente sem travar o servidor.
-	 */
-    private Socket socket; //Guarda a conexão com o cliente.
-    private BufferedReader in; //Serve para ler mensagens enviadas pelo cliente.
-    private PrintWriter out; //Serve para enviar mensagens ao cliente.
-    private String username; //Armazena o nome do utilizador conectado.
+
+    private Socket socket;
+    private BufferedReader in;
+    private PrintWriter out;
+    private String username;
 
     public Atendente(Socket socket) {
         this.socket = socket;
     }
-//socket.getInputStream(); - permite receber e enviar mensagens.
-//socket.getOutputStream(); - permite receber e enviar mensagens.
+
     @Override
     public void run() {
         try {
-            in  = new BufferedReader(new InputStreamReader(socket.getInputStream())); //recebe e lê os dados enviados pelo cliente através da conexão (Socket).
-            out = new PrintWriter(socket.getOutputStream(), true); //envia dados e mensagens do servidor para o cliente através da conexão (Socket).
+            in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(socket.getOutputStream(), true);
 
-            // pedir nome ao cliente
-            out.println("Username:");
-            username = in.readLine();
+            // FASE DE LOGIN
+            // antes de ter nome, o cliente pode usar HELP, QUIT ou NICK
+            out.println("200 Use NICK <nome> para entrar | HELP para ajuda | QUIT para sair");
 
-            // validar se nome esta vazio
-            if (username == null || username.trim().isEmpty()) {
-                out.println("400 nome invalido");
-                socket.close();
-                return;
-            }
-            username = username.trim(); // trim - Remove espaços em branco no início e no fim da string.
-
-            // validar tamanho do nome
-            if (username.length() < 3 || username.length() > 20) {
-                out.println("400 nome deve ter entre 3 a 20 caracteres");
-                socket.close();
-                return;
-            }
-
-            // validar se nome ja esta em uso
-            if (GerirCliente.existeCliente(username)) {
-                out.println("409 nome ja utilizado");
-                socket.close();
-                return;
-            }
-
-            // registar cliente
-            GerirCliente.addClient(username, this);
-            Logger.log(username + " entrou");
-            out.println("200 bem-vindo " + username);
-
-            // loop principal de comandos
             String mensagem;
             while ((mensagem = in.readLine()) != null) {
+                mensagem = mensagem.trim();
 
+                if (mensagem.equalsIgnoreCase("HELP")) {
+                    out.println("200 antes do login: NICK <nome> | HELP | QUIT");
+                    continue;
+                }
+
+                if (mensagem.equalsIgnoreCase("QUIT")) {
+                    out.println("200 adeus");
+                    socket.close();
+                    return;
+                }
+
+                if (mensagem.toUpperCase().startsWith("NICK ")) {
+                    String nome = mensagem.substring(5).trim();
+
+                    // validar se nome esta vazio
+                    if (nome.isEmpty()) {
+                        out.println("400 nome invalido. Tente: NICK <nome>");
+                        continue; // pede novamente sem fechar
+                    }
+
+                    // validar tamanho
+                    if (nome.length() < 3 || nome.length() > 20) {
+                        out.println("400 nome deve ter entre 3 a 20 caracteres. Tente: NICK <nome>");
+                        continue; // pede novamente sem fechar
+                    }
+
+                    // validar se ja esta em uso
+                    if (GerirCliente.existeCliente(nome)) {
+                        out.println("409 nome ja utilizado. Tente: NICK <outro nome>");
+                        continue; // pede novamente sem fechar
+                    }
+
+                    // nome aceite — regista e avanca
+                    username = nome;
+                    GerirCliente.addClient(username, this);
+                    Logger.log(username + " entrou");
+                    out.println("200 bem-vindo " + username);
+                    break; // sai do loop de login
+                }
+
+                // qualquer outro comando antes do login
+                out.println("400 faca login primeiro. Use NICK <nome>");
+            }
+
+            // FASE PRINCIPAL — loop de comandos apos login
+            while ((mensagem = in.readLine()) != null) {
                 mensagem = mensagem.trim();
                 Logger.log(username + " : " + mensagem);
 
@@ -102,24 +110,16 @@ public class Atendente implements Runnable {
                 }
             }
 
-        //NOVO - CATCH TIMEOUT
-        // este catch e novo - antes so existia catch (Exception e)
-        // agora tratamos o timeout separadamente:
-        // 1. avisar o cliente com "408 timeout"
-        // 2. registar no log que foi por timeout e nao por erro
-            
         } catch (SocketTimeoutException e) {
-            out.println("408 timeout");
-            Logger.log(username + " desligado por timeout");
+            if (out != null) out.println("408 timeout");
+            Logger.log((username != null ? username : "cliente") + " desligado por timeout");
 
         } catch (Exception e) {
             Logger.log("Cliente desligado inesperadamente");
 
         } finally {
             GerirCliente.removerCliente(username);
-            try {
-                socket.close();
-            } catch (Exception ignored) {}
+            try { socket.close(); } catch (Exception ignored) {}
         }
     }
 
@@ -134,7 +134,7 @@ public class Atendente implements Runnable {
         out.println("200 utilizadores: " + lista);
     }
 
-    // MSG - enviar mensagem publica para todos
+    // MSG - enviar mensagem publica para todos EXCETO o remetente
     private void tratarMsg(String mensagem) {
         String texto = mensagem.substring(4).trim();
 
@@ -143,7 +143,10 @@ public class Atendente implements Runnable {
             return;
         }
 
-        GerirCliente.transmissao("MSG " + username + ": " + texto);
+        // envia para todos menos para o proprio
+        GerirCliente.transmissaoExceto("MSG " + username + ": " + texto, username);
+
+        // o remetente recebe so a confirmacao
         out.println("200 mensagem enviada");
         Logger.log(username + " enviou mensagem publica: " + texto);
     }

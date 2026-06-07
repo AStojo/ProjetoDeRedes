@@ -31,9 +31,9 @@ public class Servidor {
 			while(true) {
 				Socket socket = serverSocket.accept();
 //--- TIMEOUT ---
-// se o cliente nao enviar nada durante 30 minutos (1.800.000 ms), desliga automaticamente
+// se o cliente nao enviar nada durante 3 minutos (180.000 ms), desliga automaticamente
 // sem isto o servidor ficaria bloqueado para sempre à espera do cliente
-				socket.setSoTimeout(1800000);
+				socket.setSoTimeout(180000);
 				
 				Logger.log("Novo cliente ligado de" + socket.getInetAddress());
 				Atendente client = new Atendente(socket);
