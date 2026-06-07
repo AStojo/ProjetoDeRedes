@@ -97,11 +97,20 @@ public class Atendente implements Runnable {
 
                 } else if (mensagem.toUpperCase().startsWith("SEND ")) {
                     tratarSend();
+              
+                } else if (mensagem.toUpperCase().startsWith("NICK ")) {
+                    tratarNickChange(mensagem);
 
+                } else if (mensagem.equalsIgnoreCase("PING")) {
+                    tratarPing();
+
+                } else if (mensagem.equalsIgnoreCase("TIME")) {
+                    tratarTime();
+                    
                 } else if (mensagem.equalsIgnoreCase("QUIT")) {
                     tratarQuit();
                     break;
-
+                    
                 } else if (mensagem.isEmpty()) {
                     // ignorar linhas vazias
 
@@ -130,13 +139,14 @@ public class Atendente implements Runnable {
 
     // HELP - mostrar comandos disponiveis
     private void tratarHelp() {
-        out.println("200 comandos: WHO | MSG <texto> | PM <nick> <texto> | SEND <ficheiro> | QUIT");
+        out.println("200 comandos: \n| WHO \n| MSG <texto> \n| PM <nick> <texto> \n| SEND <ficheiro> \n| CHANGE NICK \n| PING \n| SERVIDOR TIME \n| QUIT");
     }
-
-    // WHO - listar utilizadores ligados
+    
+ // WHO - listar utilizadores ligados com contagem
     private void tratarWho() {
         String lista = GerirCliente.listarClientes();
-        out.println("200 utilizadores: " + lista);
+        int total = GerirCliente.contarClientes();
+        out.println("200 utilizadores ligados (" + total + "): " + lista);
     }
 
     // MSG - enviar mensagem publica para todos EXCETO o remetente
@@ -251,7 +261,57 @@ public class Atendente implements Runnable {
         }
     }
 
-    // QUIT - desligar o cliente
+// CHANGE NICK - mudar o nome depois do login
+    private void tratarNickChange(String mensagem) {
+        String novoNome = mensagem.substring(5).trim();
+
+        // validar se nome esta vazio
+        if (novoNome.isEmpty()) {
+            out.println("400 formato: NICK <novo_nome>");
+            return;
+        }
+
+        // validar tamanho
+        if (novoNome.length() < 3 || novoNome.length() > 20) {
+            out.println("400 nome deve ter entre 3 a 20 caracteres");
+            return;
+        }
+
+        // validar se ja esta em uso
+        if (GerirCliente.existeCliente(novoNome)) {
+            out.println("409 nome ja utilizado");
+            return;
+        }
+
+        // guardar nome antigo para o log e notificacao
+        String nomeAntigo = username;
+
+        // atualizar no mapa — remove o antigo e adiciona o novo
+        GerirCliente.removerCliente(username);
+        username = novoNome;
+        GerirCliente.addClient(username, this);
+
+        // notificar todos da mudanca
+        GerirCliente.transmissaoExceto("*** " + nomeAntigo + " mudou o nome para " + username, username);
+        out.println("200 nome alterado para " + username);
+        Logger.log(nomeAntigo + " mudou o nome para " + username);
+    }
+
+// PING - verificar se o servidor esta a responder
+    private void tratarPing() {
+        out.println("200 PONG");
+        Logger.log(username + " fez PING");
+    }
+
+// TIME - mostrar hora atual do servidor
+    private void tratarTime() {
+        String hora = java.time.LocalDateTime.now()
+            .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        out.println("200 hora do servidor: " + hora);
+        Logger.log(username + " pediu TIME");
+    }
+
+// QUIT - desligar o cliente
     private void tratarQuit() {
         out.println("200 adeus");
         Logger.log(username + " saiu");

@@ -62,4 +62,9 @@ public class GerirCliente {
             }
         }
     }
+    
+// contar quantos clientes estao ligados
+    public static int contarClientes() {
+        return clientes.size();
+    }
 }
