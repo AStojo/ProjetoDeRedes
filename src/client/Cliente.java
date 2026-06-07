@@ -5,20 +5,19 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
 public class Cliente {
 
-    // variavel para controlar se o cliente esta ligado
     private static boolean ativo = true;
 
     public static void main(String[] args) {
 
         Scanner sc = new Scanner(System.in);
 
-        // pedir host e porta ao utilizador
         System.out.println("Host do servidor (ex.: 127.0.0.1): ");
         String host = sc.nextLine();
 
@@ -26,35 +25,28 @@ public class Cliente {
         int porta = Integer.parseInt(sc.nextLine());
 
         try {
-            // ligar ao servidor
             Socket socket = new Socket(host, porta);
             System.out.println("Ligado ao servidor " + host + ":" + porta);
             System.out.println("Escreva HELP para ver os comandos.");
 
-            // stream para ler mensagens do servidor
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            // UTF-8 explícito — evita dependência do encoding do sistema
+            BufferedReader in = new BufferedReader(
+                new InputStreamReader(socket.getInputStream(), "UTF-8"));
+            PrintWriter out = new PrintWriter(
+                new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true);
 
-            // stream para enviar mensagens ao servidor (true = envia imediatamente)
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-
-            // criar thread para receber mensagens do servidor em paralelo
             ThreadRecetor recetor = new ThreadRecetor(in);
             Thread threadRecetor = new Thread(recetor);
             threadRecetor.start();
 
-            // loop principal: ler comandos do teclado e enviar ao servidor
             while (ativo) {
                 String comando = sc.nextLine();
 
-                if (comando == null) {
-                    break;
-                }
+                if (comando == null) break;
 
                 comando = comando.trim();
 
-                if (comando.isEmpty()) {
-                    continue;
-                }
+                if (comando.isEmpty()) continue;
 
                 // tratamento especial para SEND
                 if (comando.toUpperCase().startsWith("SEND ")) {
@@ -63,16 +55,13 @@ public class Cliente {
                     continue;
                 }
 
-                // enviar o comando ao servidor
                 out.println(comando);
 
-                // se o utilizador escreveu QUIT, terminar
                 if (comando.equalsIgnoreCase("QUIT")) {
                     ativo = false;
                 }
             }
 
-            // fechar tudo
             socket.close();
             System.out.println("Cliente terminado.");
 
@@ -83,10 +72,8 @@ public class Cliente {
         sc.close();
     }
 
-    // metodo para enviar ficheiro ao servidor
     private static void enviarFicheiro(String nomeFicheiro, Socket socket, PrintWriter out) {
 
-        // verificar se o ficheiro existe
         File ficheiro = new File(nomeFicheiro);
 
         if (!ficheiro.exists()) {
@@ -99,7 +86,6 @@ public class Cliente {
             return;
         }
 
-        // verificar tamanho maximo (5 MB)
         long limiteBytes = 5 * 1024 * 1024;
         if (ficheiro.length() > limiteBytes) {
             System.out.println("Erro: ficheiro demasiado grande (maximo 5 MB).");
@@ -107,23 +93,17 @@ public class Cliente {
         }
 
         try {
-            // avisar o servidor que vai receber um ficheiro
             out.println("SEND " + ficheiro.getName());
 
-            // usar DataOutputStream para enviar bytes
             DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
 
-            // 1. enviar tamanho do nome
+            // UTF-8 explícito no nome do ficheiro
             byte[] nomeBytes = ficheiro.getName().getBytes("UTF-8");
-            dos.writeInt(nomeBytes.length);
+            dos.writeInt(nomeBytes.length);  // [int nameLen]
+            dos.write(nomeBytes);            // [nameBytes UTF-8]
+            dos.writeLong(ficheiro.length()); // [long fileLen]
 
-            // 2. enviar nome do ficheiro
-            dos.write(nomeBytes);
-
-            // 3. enviar tamanho do ficheiro
-            dos.writeLong(ficheiro.length());
-
-            // 4. enviar conteudo do ficheiro
+            // [fileBytes]
             FileInputStream fis = new FileInputStream(ficheiro);
             byte[] buffer = new byte[4096];
             int lido;
@@ -133,7 +113,8 @@ public class Cliente {
             fis.close();
             dos.flush();
 
-            System.out.println("Ficheiro enviado: " + ficheiro.getName() + " (" + ficheiro.length() + " bytes)");
+            System.out.println("Ficheiro enviado: " + ficheiro.getName()
+                + " (" + ficheiro.length() + " bytes)");
 
         } catch (Exception e) {
             System.out.println("Erro ao enviar ficheiro: " + e.getMessage());

@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -23,19 +24,28 @@ public class Atendente implements Runnable {
     @Override
     public void run() {
         try {
-            in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true);
+        	in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
+        	out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true);
 
             // FASE DE LOGIN
             // antes de ter nome, o cliente pode usar HELP, QUIT ou NICK
-            out.println("\nComandos disponíveis: \n|NICK <nome> para entrar \n|HELP para ajuda \n|QUIT para sair");
+            out.println("=======================================================");
+            out.println("   Bem-vindoSS ao Sistema Distribuído de Comunicação ");
+            out.println("=======================================================");
+            out.println("Comandos disponiveis:");
+            out.println("NICK <nome>");
+            out.println("HELP");
+            out.println("QUIT");
 
             String mensagem;
             while ((mensagem = in.readLine()) != null) {
                 mensagem = mensagem.trim();
 
                 if (mensagem.equalsIgnoreCase("HELP")) {
-                    out.println("200 antes do login: NICK <nome> | HELP | QUIT");
+                    out.println("200 comandos disponiveis antes do login:");
+                    out.println("NICK <nome> - registar username");
+                    out.println("HELP        - lista de comandos");
+                    out.println("QUIT        - sair");
                     continue;
                 }
 
@@ -139,7 +149,29 @@ public class Atendente implements Runnable {
 
     // HELP - mostrar comandos disponiveis
     private void tratarHelp() {
-        out.println("200 comandos: \n| WHO \n| MSG <texto> \n| PM <nick> <texto> \n| SEND <ficheiro> \n| CHANGE NICK \n| PING \n| SERVIDOR TIME \n| QUIT");
+    	out.println(" ");
+    	    out.println("200 GLOSSARIO");
+    	    out.println("---------------------------------------------------");
+    	    out.println(" ");
+    	    out.println("PROTOCOLOS:");
+    	    out.println("WHO                - Lista utilizadores ativos");
+    	    out.println("MSG <texto>        - Envia mensagem publica");
+    	    out.println("PM <nick> <texto>  - Envia mensagem privada");
+    	    out.println("SEND <ficheiro>    - Envia ficheiro para o servidor");
+    	    out.println("NICK <novo_nome>   - Altera o teu username");
+    	    out.println("PING               - Verifica ligacao ao servidor");
+    	    out.println("TIME               - Devolve o tempo atual do servidor");
+    	    out.println("QUIT               - Desconecta a ligacao");
+    	    out.println(" ");
+    	    out.println("CODIGOS DE RESPOSTA:");
+    	    out.println("200 - Operacao realizada com sucesso");
+    	    out.println("400 - Pedido invalido");
+    	    out.println("401 - Cliente ainda não registrado");
+    	    out.println("404 - Recurso ou utilizador nao encontrado");
+    	    out.println("408 - Timeout");
+    	    out.println("409 - Nome ja utilizado");
+    	    out.println("500 - Erro interno do servidor");
+    	    out.println("---------------------------------------------------");
     }
     
  // WHO - listar utilizadores ligados com contagem
