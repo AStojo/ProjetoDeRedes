@@ -28,7 +28,7 @@ public class Atendente implements Runnable {
 
             // FASE DE LOGIN
             // antes de ter nome, o cliente pode usar HELP, QUIT ou NICK
-            out.println("200 Use NICK <nome> para entrar | HELP para ajuda | QUIT para sair");
+            out.println("\nComandos disponíveis: \n|NICK <nome> para entrar \n|HELP para ajuda \n|QUIT para sair");
 
             String mensagem;
             while ((mensagem = in.readLine()) != null) {
@@ -41,10 +41,10 @@ public class Atendente implements Runnable {
 
                 if (mensagem.equalsIgnoreCase("QUIT")) {
                     out.println("200 adeus");
-                    socket.close();
+                    try { socket.close(); } catch (Exception ignored) {}
                     return;
                 }
-
+                
                 if (mensagem.toUpperCase().startsWith("NICK ")) {
                     String nome = mensagem.substring(5).trim();
 
@@ -115,10 +115,15 @@ public class Atendente implements Runnable {
             Logger.log((username != null ? username : "cliente") + " desligado por timeout");
 
         } catch (Exception e) {
-            Logger.log("Cliente desligado inesperadamente");
-
+            Logger.log("Cliente desligado inesperadamente: " + e.getMessage());
+        
         } finally {
-            GerirCliente.removerCliente(username);
+            if (username != null) {
+                GerirCliente.removerCliente(username);
+                Logger.log(username + " desligado"); // ← so se tinha login
+            } else {
+                Logger.log("cliente anonimo desligado"); // ← se saiu sem login
+            }
             try { socket.close(); } catch (Exception ignored) {}
         }
     }
