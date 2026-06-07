@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -23,28 +24,37 @@ public class Atendente implements Runnable {
     @Override
     public void run() {
         try {
-            in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true);
+        	in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
+        	out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true);
 
             // FASE DE LOGIN
             // antes de ter nome, o cliente pode usar HELP, QUIT ou NICK
-            out.println("200 Use NICK <nome> para entrar | HELP para ajuda | QUIT para sair");
+            out.println("=======================================================");
+            out.println("   Bem-vindoSS ao Sistema Distribuído de Comunicação ");
+            out.println("=======================================================");
+            out.println("Comandos disponiveis:");
+            out.println("NICK <nome>");
+            out.println("HELP");
+            out.println("QUIT");
 
             String mensagem;
             while ((mensagem = in.readLine()) != null) {
                 mensagem = mensagem.trim();
 
                 if (mensagem.equalsIgnoreCase("HELP")) {
-                    out.println("200 antes do login: NICK <nome> | HELP | QUIT");
+                    out.println("200 comandos disponiveis antes do login:");
+                    out.println("NICK <nome> - registar username");
+                    out.println("HELP        - lista de comandos");
+                    out.println("QUIT        - sair");
                     continue;
                 }
 
                 if (mensagem.equalsIgnoreCase("QUIT")) {
                     out.println("200 adeus");
-                    socket.close();
+                    try { socket.close(); } catch (Exception ignored) {}
                     return;
                 }
-
+                
                 if (mensagem.toUpperCase().startsWith("NICK ")) {
                     String nome = mensagem.substring(5).trim();
 
@@ -97,11 +107,20 @@ public class Atendente implements Runnable {
 
                 } else if (mensagem.toUpperCase().startsWith("SEND ")) {
                     tratarSend();
+              
+                } else if (mensagem.toUpperCase().startsWith("NICK ")) {
+                    tratarNickChange(mensagem);
 
+                } else if (mensagem.equalsIgnoreCase("PING")) {
+                    tratarPing();
+
+                } else if (mensagem.equalsIgnoreCase("TIME")) {
+                    tratarTime();
+                    
                 } else if (mensagem.equalsIgnoreCase("QUIT")) {
                     tratarQuit();
                     break;
-
+                    
                 } else if (mensagem.isEmpty()) {
                     // ignorar linhas vazias
 
@@ -115,23 +134,51 @@ public class Atendente implements Runnable {
             Logger.log((username != null ? username : "cliente") + " desligado por timeout");
 
         } catch (Exception e) {
-            Logger.log("Cliente desligado inesperadamente");
-
+            Logger.log("Cliente desligado inesperadamente: " + e.getMessage());
+        
         } finally {
-            GerirCliente.removerCliente(username);
+            if (username != null) {
+                GerirCliente.removerCliente(username);
+                Logger.log(username + " desligado"); // ← so se tinha login
+            } else {
+                Logger.log("cliente anonimo desligado"); // ← se saiu sem login
+            }
             try { socket.close(); } catch (Exception ignored) {}
         }
     }
 
     // HELP - mostrar comandos disponiveis
     private void tratarHelp() {
-        out.println("200 comandos: WHO | MSG <texto> | PM <nick> <texto> | SEND <ficheiro> | QUIT");
+    	out.println(" ");
+    	    out.println("200 GLOSSARIO");
+    	    out.println("---------------------------------------------------");
+    	    out.println(" ");
+    	    out.println("PROTOCOLOS:");
+    	    out.println("WHO                - Lista utilizadores ativos");
+    	    out.println("MSG <texto>        - Envia mensagem publica");
+    	    out.println("PM <nick> <texto>  - Envia mensagem privada");
+    	    out.println("SEND <ficheiro>    - Envia ficheiro para o servidor");
+    	    out.println("NICK <novo_nome>   - Altera o teu username");
+    	    out.println("PING               - Verifica ligacao ao servidor");
+    	    out.println("TIME               - Devolve o tempo atual do servidor");
+    	    out.println("QUIT               - Desconecta a ligacao");
+    	    out.println(" ");
+    	    out.println("CODIGOS DE RESPOSTA:");
+    	    out.println("200 - Operacao realizada com sucesso");
+    	    out.println("400 - Pedido invalido");
+    	    out.println("401 - Cliente ainda não registrado");
+    	    out.println("404 - Recurso ou utilizador nao encontrado");
+    	    out.println("408 - Timeout");
+    	    out.println("409 - Nome ja utilizado");
+    	    out.println("500 - Erro interno do servidor");
+    	    out.println("---------------------------------------------------");
     }
-
-    // WHO - listar utilizadores ligados
+    
+ // WHO - listar utilizadores ligados com contagem
     private void tratarWho() {
         String lista = GerirCliente.listarClientes();
-        out.println("200 utilizadores: " + lista);
+        int total = GerirCliente.contarClientes();
+        out.println("200 utilizadores ligados (" + total + "): " + lista);
     }
 
     // MSG - enviar mensagem publica para todos EXCETO o remetente
@@ -246,7 +293,57 @@ public class Atendente implements Runnable {
         }
     }
 
-    // QUIT - desligar o cliente
+// CHANGE NICK - mudar o nome depois do login
+    private void tratarNickChange(String mensagem) {
+        String novoNome = mensagem.substring(5).trim();
+
+        // validar se nome esta vazio
+        if (novoNome.isEmpty()) {
+            out.println("400 formato: NICK <novo_nome>");
+            return;
+        }
+
+        // validar tamanho
+        if (novoNome.length() < 3 || novoNome.length() > 20) {
+            out.println("400 nome deve ter entre 3 a 20 caracteres");
+            return;
+        }
+
+        // validar se ja esta em uso
+        if (GerirCliente.existeCliente(novoNome)) {
+            out.println("409 nome ja utilizado");
+            return;
+        }
+
+        // guardar nome antigo para o log e notificacao
+        String nomeAntigo = username;
+
+        // atualizar no mapa — remove o antigo e adiciona o novo
+        GerirCliente.removerCliente(username);
+        username = novoNome;
+        GerirCliente.addClient(username, this);
+
+        // notificar todos da mudanca
+        GerirCliente.transmissaoExceto("*** " + nomeAntigo + " mudou o nome para " + username, username);
+        out.println("200 nome alterado para " + username);
+        Logger.log(nomeAntigo + " mudou o nome para " + username);
+    }
+
+// PING - verificar se o servidor esta a responder
+    private void tratarPing() {
+        out.println("200 PONG");
+        Logger.log(username + " fez PING");
+    }
+
+// TIME - mostrar hora atual do servidor
+    private void tratarTime() {
+        String hora = java.time.LocalDateTime.now()
+            .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        out.println("200 hora do servidor: " + hora);
+        Logger.log(username + " pediu TIME");
+    }
+
+// QUIT - desligar o cliente
     private void tratarQuit() {
         out.println("200 adeus");
         Logger.log(username + " saiu");
