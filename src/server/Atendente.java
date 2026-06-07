@@ -29,9 +29,9 @@ public class Atendente implements Runnable {
 
             // FASE DE LOGIN
             // antes de ter nome, o cliente pode usar HELP, QUIT ou NICK
-            out.println("=======================================================");
-            out.println("   Bem-vindoSS ao Sistema Distribuído de Comunicação ");
-            out.println("=======================================================");
+            out.println("   Bem-vindo ao Sistema Distribuído de Comunicação ");
+            out.println("------------------------------------------------------");
+            out.println("");
             out.println("Comandos disponiveis:");
             out.println("NICK <nome>");
             out.println("HELP");
@@ -85,7 +85,7 @@ public class Atendente implements Runnable {
                 }
 
                 // qualquer outro comando antes do login
-                out.println("400 faca login primeiro. Use NICK <nome>");
+                out.println("401 faca login primeiro. Use NICK <nome>");
             }
 
             // FASE PRINCIPAL — loop de comandos apos login
@@ -166,7 +166,7 @@ public class Atendente implements Runnable {
     	    out.println("CODIGOS DE RESPOSTA:");
     	    out.println("200 - Operacao realizada com sucesso");
     	    out.println("400 - Pedido invalido");
-    	    out.println("401 - Cliente ainda não registrado");
+    	    out.println("401 - Cliente ainda não registado");
     	    out.println("404 - Recurso ou utilizador nao encontrado");
     	    out.println("408 - Timeout");
     	    out.println("409 - Nome ja utilizado");
