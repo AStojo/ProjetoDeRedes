@@ -3,9 +3,9 @@
 ## Universidade Portucalense (UPT)
 
 **Curso:** Engenharia Informática
-**Unidade Curricular:** Redes de Computadores
+**Unidade Curricular: Redes de Computadores
 **Docente:** Fernando Moreira
-**Ano Letivo:** 2025/2026
+**Ano Letivo: 2025/2026
 
 ### Grupo 2
 
