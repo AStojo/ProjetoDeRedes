@@ -36,7 +36,7 @@ import java.time.format.DateTimeFormatter;
  * @author Grupo 2
  * @version 3.0
  */
- class Logger {
+ public class Logger {
 
 	private static final String FICHEIRO_LOG = "servidor.log";
     private static final DateTimeFormatter FORMATO =
