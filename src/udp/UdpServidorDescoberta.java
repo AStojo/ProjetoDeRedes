@@ -1,8 +1,11 @@
-package server;
+package udp;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+
+import server.Logger;
+import server.Servidor;
  
 public class UdpServidorDescoberta {
  
@@ -28,7 +31,7 @@ public class UdpServidorDescoberta {
  
                 // se o cliente enviou DISCOVER, responder com o endereço e porta TCP
                 if (mensagem.trim().equalsIgnoreCase("DISCOVER")) {
-                    String resposta = "SERVER " + InetAddress.getLocalHost().getHostAddress() + " 5000";
+                    String resposta = "SERVER " + InetAddress.getLocalHost().getHostAddress() + " "+ Servidor.getPorta();
                     byte[] respostaBytes = resposta.getBytes();
  
                     // enviar resposta para o cliente

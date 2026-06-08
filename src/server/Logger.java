@@ -1,24 +1,48 @@
 package server;
 
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class Logger {
-	
-	public static void log(String mensagem) { // imprime o tempo que foi enviado ([horas: minutos:segundos])
-		String tempo= LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-		System.out.println("["+ tempo + "]   " + mensagem);
-	/**.format(..)
-	 * Aplica o formato à data/hora obtida.
-	 * 
-	 * DateTimeFormatter.ofPattern("HH:mm:ss")
-     * Define o formato em que a hora será apresentada.
-     *
-     *HH → horas (00–23)
-     *mm → minutos
-     *ss → segundos
-	 */
-	
-	}
-}
 
+    private static final String FICHEIRO_LOG = "servidor.log";
+    private static final DateTimeFormatter FORMATO =
+        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    // log informativo — arranque, ligações, saídas, ficheiros
+    public static void info(String clienteId, String mensagem) {
+        escrever("INFO", clienteId, mensagem);
+    }
+
+    // log de comando recebido
+    public static void recv(String clienteId, String mensagem) {
+        escrever("RECV", clienteId, mensagem);
+    }
+
+    // log de erro
+    public static void erro(String clienteId, String mensagem) {
+        escrever("ERR ", clienteId, mensagem);
+    }
+
+    // log sem cliente (arranque do servidor)
+    public static void log(String mensagem) {
+        escrever("INFO", "servidor", mensagem);
+    }
+
+    private static void escrever(String tipo, String clienteId, String mensagem) {
+        String linha = LocalDateTime.now().format(FORMATO)
+            + " | " + tipo
+            + " | " + clienteId
+            + " | " + mensagem;
+
+        System.out.println(linha);
+
+        try (PrintWriter fw = new PrintWriter(new FileWriter(FICHEIRO_LOG, true))) {
+            fw.println(linha);
+        } catch (Exception e) {
+            System.err.println("Erro ao escrever log: " + e.getMessage());
+        }
+    }
+}

@@ -18,10 +18,10 @@ public class Cliente {
 
         Scanner sc = new Scanner(System.in);
 
-        System.out.println("Host do servidor (ex.: 127.0.0.1): ");
+        System.out.println("IP/Host do servidor: ");
         String host = sc.nextLine();
 
-        System.out.println("Porta do servidor (ex.: 5000): ");
+        System.out.println("Porta do servidor: ");
         int porta = Integer.parseInt(sc.nextLine());
 
         try {
@@ -66,7 +66,7 @@ public class Cliente {
             System.out.println("Cliente terminado.");
 
         } catch (Exception e) {
-            System.out.println("ERRO: " + e.getMessage());
+            System.out.println("400 ERRO: " + e.getMessage());
         }
 
         sc.close();
@@ -77,18 +77,18 @@ public class Cliente {
         File ficheiro = new File(nomeFicheiro);
 
         if (!ficheiro.exists()) {
-            System.out.println("Erro: ficheiro nao encontrado.");
+            System.out.println("400 Erro: ficheiro nao encontrado.");
             return;
         }
 
         if (ficheiro.length() == 0) {
-            System.out.println("Erro: ficheiro vazio.");
+            System.out.println("400 Erro: ficheiro vazio.");
             return;
         }
 
         long limiteBytes = 5 * 1024 * 1024;
         if (ficheiro.length() > limiteBytes) {
-            System.out.println("Erro: ficheiro demasiado grande (maximo 5 MB).");
+            System.out.println("400 Erro: ficheiro demasiado grande (maximo 5 MB).");
             return;
         }
 
@@ -117,7 +117,7 @@ public class Cliente {
                 + " (" + ficheiro.length() + " bytes)");
 
         } catch (Exception e) {
-            System.out.println("Erro ao enviar ficheiro: " + e.getMessage());
+            System.out.println("400 Erro ao enviar ficheiro: " + e.getMessage());
         }
     }
 }

@@ -6,12 +6,20 @@ import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import udp.UdpServidorDescoberta;
+
 public class Servidor {
+
+private static int porta;
+
+public static int getPorta() {
+    return porta;
+}
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
 		
 		System.out.println("Indique a porta:");
-		int porta = sc.nextInt();
+		Servidor.porta = sc.nextInt();
 		
 		// criar pool de threads gerido — substitui new Thread(...).start()
         // newCachedThreadPool: reutiliza threads livres e cria novas apenas se necessário
@@ -45,5 +53,8 @@ public class Servidor {
 		}finally {
 			pool.shutdown(); // liberta recursos quando o servidor termina
 		}
+		
+		
+	
 	}
 }
