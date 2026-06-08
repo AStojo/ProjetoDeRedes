@@ -91,7 +91,7 @@ public class Atendente implements Runnable {
                     break;
                 }
 
-                out.println("401 faca login primeiro. Exemplo: NICK alice");
+                out.println("401 faça login primeiro. Exemplo: NICK alice");
             }
 
             // FASE PRINCIPAL
