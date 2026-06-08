@@ -1,191 +1,329 @@
-# 🌐 Projeto de Redes de Computadores
+# Projeto de Redes de Computadores
 
-### 🏛️ Universidade Portucalense (UPT) | Engenharia Informática
-### 📋 UC: Redes de Computadores
-### 👨‍🏫 Docente: Fernando Moreira
-### 📅 Ano Letivo: 2025/2026
+## Universidade Portucalense (UPT)
 
----
+**Curso:** Engenharia Informática
+**Unidade Curricular:** Redes de Computadores
+**Docente:** Fernando Moreira
+**Ano Letivo:** 2025/2026
 
-## ✨ 1. Sobre o Projeto
+### Grupo 2
 
-> **TEMA:** Sistema Distribuído de Comunicação e Partilha de Ficheiros em Java
-
-* **DESCRIÇÃO:** Este projeto consiste no desenvolvimento de um sistema **cliente/servidor em Java** que permite a vários utilizadores ligarem-se a um servidor central para comunicar, consultar utilizadores ativos e transferir ficheiros de pequena dimensão.
-* **OBJETIVO:** Demonstrar domínio dos conceitos fundamentais de redes — ligação, protocolo, framing, concorrência, validação, robustez, tratamento de erros e observação do sistema através de logs.
-* O sistema combina comunicação **TCP** (autenticação, mensagens, comandos, listagem de utilizadores e transferência de ficheiros) e **UDP** (medição de latência / descoberta de servidor).
-
----
-
-## 🛠️ 2. Tecnologias Usadas
-
-| Tecnologia | Detalhe |
-|---|---|
-| Java | JDK 17+ |
-| IDE | Eclipse |
-| Protocolo de Transporte | TCP + UDP |
-| Controlo de Versões | GitHub & GitHub Desktop |
-| Codificação | UTF-8 |
-
-**Classes principais da biblioteca padrão Java utilizadas:**
-- `Socket` / `ServerSocket`
-- `DatagramSocket` / `DatagramPacket`
-- `BufferedReader` / `BufferedWriter`
-- `DataInputStream` / `DataOutputStream`
-- `ExecutorService`
+| Nome           | Nº Aluno |
+| -------------- | -------- |
+| Ana Souto      | 53986    |
+| António Santos | 47303    |
+| Diogo Ferreira | 53501    |
+| João Pinto     | 53255    |
+| Tomás Santos   | 34379    |
 
 ---
 
-## 👥 3. Equipa de Desenvolvimento (Grupo 2)
+# 1. Descrição do Projeto
 
-| Nome | Número de Aluno |
-|---|---|
-| Ana Souto | `53986` |
-| António Santos | `47303` |
-| Diogo Ferreira | `53501` |
-| João Pinto | `53255` |
-| Tomás Santos | `34379` |
+Este projeto consiste no desenvolvimento de um sistema distribuído cliente/servidor em Java para comunicação e partilha de ficheiros através da rede.
+
+O sistema permite:
+
+* Ligação simultânea de múltiplos clientes;
+* Troca de mensagens públicas;
+* Envio de mensagens privadas;
+* Consulta dos utilizadores ativos;
+* Transferência de ficheiros para o servidor;
+* Descoberta automática do servidor através de UDP Broadcast.
+
+A implementação utiliza TCP para a comunicação principal e UDP para a funcionalidade de descoberta do servidor na rede local.
 
 ---
 
-## 📐 4. Arquitetura do Sistema
+# 2. Tecnologias Utilizadas
 
+| Tecnologia   | Descrição                    |
+| ------------ | ---------------------------- |
+| Java JDK 17+ | Linguagem de programação     |
+| Eclipse IDE  | Ambiente de desenvolvimento  |
+| TCP          | Comunicação cliente/servidor |
+| UDP          | Descoberta do servidor       |
+| GitHub       | Controlo de versões          |
+
+Bibliotecas Java utilizadas:
+
+* ServerSocket
+* Socket
+* DatagramSocket
+* DatagramPacket
+* BufferedReader
+* BufferedWriter
+* DataInputStream
+* DataOutputStream
+* ExecutorService
+
+---
+
+# 3. Estrutura do Projeto
+
+```text
+ProjetoSockets_GrupoXX/ 
+│ 
+├── src/ 
+│   ├── server/ 
+│   │   ├── Servidor.java
+│   │   ├── Atendente.java
+│   │   ├── GerirCliente.java
+│   │   └── Logger.java
+│   ├── client/ 
+│   │   ├── Cliente.java 
+│   │   └── ThreadRecetor.java 
+│   └── udp/
+│       ├── UdpServidorDescoberta.java
+│       └── UdpClienteDescoberta.java     
+├── uploads/ 
+│   └── .gitkeep 
+│ 
+├── tests/ 
+│   ├── plano_testes.md 
+│   └── evidencias/ 
+│ 
+├── docs/ 
+│   ├── relatorio.pdf 
+│   └── protocolo.md 
+│ 
+├── README.md 
+└── run.bat  
 ```
-📦 ProjetoSockets_Grupo02/
-├── 📂 src/
-│   ├── 📂 server/
-│   │   ├── ...
-│   ├── 📂 client/
-│   │   ├── ...
-│   └── 📂 udp/
-│       ├── ...
-├── 📂 uploads/
-│   └── 📄 .gitkeep
-├── 📂 tests/
-│   ├── 📄 plano_testes.md
-│   └── 📂 evidencias/
-├── 📂 docs/
-│   ├── 📄 relatorio.pdf
-│   └── 📄 protocolo.md
-├── 📄 README.md
-└── 📄 run.bat
-```
 
 ---
 
-## 🔌 5. Portas Usadas
+# 4. Portas Utilizadas
 
-| Serviço | Protocolo | Porta |
-|---|---|---|
-| Servidor principal | TCP | `Definida pelo utilizador ao iniciar` (ex: `5000`) |
-| Descoberta de Servidor | UDP | `6000` |
+| Serviço                | Protocolo | Porta                    |
+| ---------------------- | --------- | ------------------------ |
+| Servidor Principal     | TCP       | Definida pelo utilizador |
+| Descoberta de Servidor | UDP       | 6000                     |
 
 ---
 
-## 🚀 6. Como Compilar e Executar
+# 5. Compilação
 
-### Como Compilar
-O projeto pode ser compilado no Eclipse IDE (importando o projeto inteiro) ou através da linha de comandos na raiz do projeto:
+O projeto pode ser compilado através do Eclipse IDE ou pela linha de comandos.
+
 ```bash
 javac -d bin src/server/*.java src/client/*.java src/udp/*.java
 ```
 
-### Como Executar o Servidor
-Para iniciar o servidor (em ambiente Windows), execute o ficheiro de automação `run.bat` presente na raiz do projeto, ou inicie via terminal:
-```bash
+---
+
+# 6. Execução do Servidor
+Após a compilação do projeto, execute a classe Servidor.
+
 cd bin
 java server.Servidor
-```
-O servidor irá pedir no terminal que indique a **porta TCP** a ser utilizada. O serviço secundário de descoberta (UDP) inicia automaticamente, em background, na porta 6000.
 
-### Como Executar o Cliente
-Para executar o cliente principal (TCP), abra um novo terminal na pasta `bin` e execute:
-```bash
+Ao iniciar, o servidor solicitará a porta TCP onde ficará à escuta:
+
+Indique a porta:
+5001
+
+Depois de introduzida uma porta válida, o servidor inicia os serviços TCP e UDP:
+
+Servidor iniciado na porta: 5001
+A aguardar clientes...
+
+O serviço de descoberta UDP é iniciado automaticamente numa thread separada e fica à escuta na porta UDP 6000.
+
+Enquanto estiver em execução, o servidor:
+
+ + Aceita múltiplos clientes em simultâneo;
+ + Gere cada cliente através de uma thread do ExecutorService;
+ + Regista eventos e operações através do sistema de logs;
+ + Fecha automaticamente ligações inativas após 3 minutos de inatividade.
+
+---
+
+# 7. Execução do Cliente
+7.1 Abrir um novo terminal e executar a classe Cliente:
+
+cd bin
 java client.Cliente
-```
-Serão pedidos o endereço do host (ex: `127.0.0.1`) e a porta TCP(ex: `5000`) especificada durante o arranque do servidor.
+
+7.2 O cliente solicitará o endereço IP (ou hostname) e a porta TCP do servidor:
+
+IP/Host do servidor:
+127.0.0.1
+
+Porta do servidor:
+5001
+
+7.3 Após estabelecer a ligação, será apresentada uma mensagem de confirmação:
+
+Ligado ao servidor 127.0.0.1:5001
+Escreva HELP para ver os comandos.
+
+7.4 Antes de utilizar os restantes comandos, o utilizador deve efetuar o registo através do comando:
+
+NICK joao
+
+Depois do login, ficam disponíveis os restantes comandos do sistema, incluindo mensagens públicas, mensagens privadas, transferência de ficheiros e consulta de utilizadores ativos.
+---
+
+# 8. Comandos Disponíveis
+
+## 8.1 Comandos Disponíveis Antes do Login
+
+| Comando     | Descrição                        | Exemplo   |
+| ----------- | -------------------------------- | --------- |
+| NICK <nome> | Regista o utilizador no servidor | NICK joao |
+| HELP        | Mostra ajuda                     | HELP      |
+| QUIT        | Termina a ligação                | QUIT      |
 
 ---
 
-## 💬 7. Protocolo de Comunicação e Comandos
+## 8.2 Comandos Disponíveis Após Login
 
-Após estabelecer a ligação e inserir um nome de utilizador válido, o cliente tem os seguintes comandos ao dispor:
+| Comando                 | Descrição                              | Exemplo             |
+| ----------------------- | -------------------------------------- | ------------------- |
+| HELP                    | Mostra a lista de comandos             | HELP                |
+| WHO                     | Lista os utilizadores ligados          | WHO                 |
+| MSG <texto>             | Envia uma mensagem pública             | MSG Bom dia a todos |
+| PM <utilizador> <texto> | Envia uma mensagem privada             | PM ana Olá Ana      |
+| SEND <ficheiro>         | Envia um ficheiro para o servidor      | SEND teste.txt      |
+| NICK <novo_nome>        | Altera o nome de utilizador atual      | NICK joao123        |
+| PING                    | Verifica a disponibilidade do servidor | PING                |
+| TIME                    | Obtém a data e hora atual do servidor  | TIME                |
+| QUIT                    | Termina a sessão                       | QUIT                |
 
-| Comando | Descrição | Exemplo |
-|---|---|---|
-| `HELP` | Lista os comandos disponíveis | `HELP` |
-| `WHO` | Lista todos os utilizadores ativos e logados | `WHO` |
-| `MSG <texto>` | Envia mensagem pública para todos | `MSG bom dia a todos` |
-| `PM <nick> <texto>` | Envia mensagem privada | `PM joao ola` |
-| `SEND <ficheiro>` | Envia ficheiro para o servidor | `SEND foto.jpg` |
-| `QUIT` | Termina a sessão e desliga do servidor | `QUIT` |
+### 8.3 Exemplos de Utilização
 
----
+```text
+NICK joao
 
-## 🧪 8. Como Testar Funcionalidades Específicas
+WHO
 
-### Como Testar a Funcionalidade UDP (Descoberta do Servidor)
-O grupo implementou a **Descoberta UDP do Servidor**. Para testar:
-1. Certifique-se de que o Servidor está em execução.
-2. Num terminal na pasta `bin`, execute a classe do cliente UDP:
-   ```bash
-   java udp.UdpClienteDescoberta
-   ```
-3. O cliente UDP enviará uma mensagem de broadcast `DISCOVER` para a rede.
-4. O servidor interceptará a mensagem na porta 6000 e responderá com o seu endereço IP e a porta TCP standard (ex: 5000), devolvendo no formato: `SERVER 192.168.1.100 5000`.
+MSG Bom dia a todos
 
-### Como Testar o Envio de Ficheiros
-1. Com o `Cliente` a correr e conectado ao servidor, assegure-se de que possui um ficheiro local válido (ex: `teste.txt`) na mesma pasta a partir de onde executou o cliente (ou insira o caminho completo).
-2. Utilize o comando `SEND`:
-   ```text
-   SEND teste.txt
-   ```
-3. O servidor processa o envio através do protocolo de framing binário e, sendo bem-sucedido, o ficheiro ficará guardado na diretoria `/uploads/` do lado do servidor.
+PM ana Olá Ana
 
----
+PING
 
-## ⚠️ 9. Limitações Conhecidas
-Durante o desenvolvimento do programa depará-mos nos com algumas restrições, sendo elas:
-- **Tamanho Limite de Ficheiros:** A transferência está limitada a ficheiros com um tamanho máximo de **5 MB**. Ficheiros de tamanho zero (vazios) também não são aceites.
-- **Segurança de Nomenclatura:** Para prevenir vulnerabilidades do tipo _Path Traversal_, nomes de ficheiros que contenham os carateres `..`, `/` ou `\` não são permitidos no comando `SEND`.
-- **Registo de Utilizador:** O nome (Username) deve ter obrigatoriamente entre 3 e 20 carateres, não aceitando os mesmos tal como não são admitidos nomes duplicados na mesma sessão.
-- **Timeout Inatividade:** O socket de cliente está configurado com um limite de inatividade de 30 minutos, de forma a conseguir fazer os testes sem a preocupação do tempo. Findo esse tempo, a conexão é encerrada automaticamente.
-- **UDP Timeout:** Ao procurar um servidor na rede, o cliente de descoberta UDP aguardará por uma resposta num limite máximo de 3 segundos antes de abortar a operação.
+TIME
 
----
+SEND teste.txt
 
-## 📜 10. Regras de Nomenclatura (GitHub)
-
-> 🌿 **Relativamente à nomeação de branches:**
-- Procurar seguir o formato nome_branch;
-- Separar com underline para melhor organização e leitura;
-- Apenas um branch por utilizador para evitar a multiplicidade desnecessária de branches.
-
-**Exemplos:**
-```
-Antonio_branch
-Ana_branch
-```
-
----
-> 💬 **Relativamente à nomeação de Commits:**
-- `[ADD]` -- adicionar algo
-- `[COR]` -- correção de um erro
-- `[ORG]` -- organizar
-- `[ATL]` -- atualização de algo
-- `[REM]` -- remoção de código / ficheiros
-- `[DOC]` -- relativo a documentação
-
-**Exemplos:**
-```
-[ADD] classe Cliente
-[COR] erro na apresentação do codigo de resposta
-[DOC] atualizar README com instruções de execução
+QUIT
 ```
 
 ---
 
-## 📜 11. Licença
+## 8.4 Códigos de Resposta
 
-Projeto académico desenvolvido no âmbito da Universidade Portucalense.  
-Uso restrito — não autorizado para fins comerciais ou reprodução sem permissão dos autores.
+| Código | Significado                          |
+| ------ | ------------------------------------ |
+| 200    | Operação realizada com sucesso       |
+| 400    | Pedido inválido                      |
+| 401    | Utilizador não autenticado           |
+| 404    | Utilizador ou recurso não encontrado |
+| 408    | Timeout da ligação                   |
+| 409    | Nome já utilizado                    |
+| 500    | Erro interno do servidor             |
+
+```
+```
+
+# 9. Protocolo de Descoberta UDP
+
+A funcionalidade UDP permite localizar automaticamente um servidor disponível na rede local.
+
+## 9.1 Pedido
+
+```text
+DISCOVER
+```
+
+## 9.2 Resposta
+
+```text
+SERVER <IP> <PORTA_TCP>
+```
+
+Exemplo:
+
+```text
+SERVER 192.168.1.100 5001
+```
+
+---
+
+# 10. Teste da Funcionalidade UDP
+
+1. Iniciar o servidor.
+2. Confirmar que o serviço UDP está ativo.
+3. Executar o cliente de descoberta UDP.
+4. O cliente envia uma mensagem DISCOVER.
+5. O servidor responde com o endereço IP e a porta TCP configurada.
+
+Resultado esperado:
+
+```text
+A procurar servidor na rede...
+
+Servidor encontrado:
+SERVER 192.168.1.100 5001
+```
+
+---
+
+# 11. Teste da Transferência de Ficheiros
+
+1. Ligar um cliente ao servidor.
+2. Garantir a existência de um ficheiro válido.
+3. Executar:
+
+```text
+SEND teste.txt
+```
+
+4. O servidor recebe e valida o ficheiro.
+5. O ficheiro é armazenado na diretoria uploads.
+
+Resultado esperado:
+
+```text
+Ficheiro recebido com sucesso.
+```
+
+---
+
+# 12. Limitações Conhecidas
+
+## 12.1 Transferência de Ficheiros
+
+* Tamanho máximo permitido: 5 MB.
+* Ficheiros vazios não são aceites.
+
+## 12.2 Segurança
+
+Para evitar ataques de Path Traversal não são permitidos nomes de ficheiros contendo:
+
+```text
+..
+/
+\
+```
+
+## 12.3 Usernames
+
+* Comprimento mínimo: 3 caracteres.
+* Comprimento máximo: 20 caracteres.
+* Não são permitidos nomes duplicados.
+
+## 12.4 Timeout
+
+* Clientes inativos são desligados automaticamente após o período configurado no servidor.
+
+## 12.5 UDP
+
+* O cliente UDP aguarda resposta durante um máximo de 3 segundos.
+-----
+#13. Limitações conhecidas
+
+O programa limita em pouco comandos e respostas simples.
