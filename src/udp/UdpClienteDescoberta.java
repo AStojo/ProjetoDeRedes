@@ -3,7 +3,34 @@ package udp;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-
+/**
+ * Cliente de descoberta automática de servidores através de UDP.
+ *
+ * Esta classe permite localizar um servidor disponível na rede
+ * local sem que o utilizador tenha de conhecer previamente o seu
+ * endereço IP ou a porta TCP utilizada.
+ *
+ * O funcionamento baseia-se no envio de uma mensagem UDP
+ * em broadcast para a porta de descoberta do servidor.
+ *
+ * Processo de funcionamento:
+ * 1. Cria um socket UDP temporário;
+ * 2. Envia a mensagem "DISCOVER" para o endereço de broadcast;
+ * 3. Aguarda uma resposta durante um período limitado;
+ * 4. Recebe o endereço IP e a porta TCP do servidor;
+ * 5. Apresenta a informação ao utilizador.
+ *
+ * Caso nenhum servidor responda dentro do tempo configurado,
+ * a operação é cancelada automaticamente através de timeout.
+ *
+ *
+ * Esta funcionalidade utiliza UDP devido ao seu baixo custo
+ * de comunicação e à facilidade de utilização de mensagens
+ * broadcast para descoberta de serviços na rede local.
+ *
+ * @author Grupo 2
+ * @version 3.0
+ */
 public class UdpClienteDescoberta {
 
     public static void main(String[] args) {

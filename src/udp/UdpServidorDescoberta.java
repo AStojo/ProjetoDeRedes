@@ -3,13 +3,29 @@ package udp;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-
 import server.Logger;
 import server.Servidor;
+
+/**
+ * Serviço de descoberta automática do servidor através de UDP.
+ *
+ * Esta classe fica à escuta numa porta UDP conhecida e responde
+ * a pedidos de descoberta enviados pelos clientes.
+ *
+ * Quando recebe a mensagem "DISCOVER", devolve o endereço IP
+ * e a porta TCP do servidor, permitindo ao cliente estabelecer
+ * posteriormente uma ligação TCP.
+ *
+ * Este mecanismo evita que o cliente tenha de conhecer
+ * antecipadamente o endereço do servidor.
+ * 
+ * @author Grupo 2
+ * @version 3.0
+ */
  
 public class UdpServidorDescoberta {
  
-    // porta UDP onde o servidor fica à escuta
+    // porta UDP escolhida onde o servidor fica à escuta
     private static int portaUDP = 6000;
  
     public static void iniciar() {

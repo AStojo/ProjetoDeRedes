@@ -9,7 +9,25 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
-
+/**
+ * Cliente principal da aplicação.
+ *
+ * Esta classe permite a ligação de um utilizador ao servidor
+ * através de uma conexão TCP, disponibilizando uma interface
+ * baseada em comandos introduzidos pela consola.
+ *
+ * Após estabelecer ligação com o servidor, o cliente cria
+ * uma thread dedicada à receção de mensagens, permitindo
+ * receber respostas e notificações enquanto o utilizador
+ * continua a introduzir comandos.
+ *
+ *
+ * Toda a comunicação textual utiliza codificação UTF-8,
+ * garantindo compatibilidade com caracteres especiais.
+ *
+ * @author Grupo 2
+ * @version 3.0
+ */
 public class Cliente {
 
     private static boolean ativo = true;

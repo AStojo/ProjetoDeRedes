@@ -10,6 +10,32 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
+/**
+ * Responsável pelo atendimento individual de cada cliente ligado ao servidor.
+ *
+ * Cada ligação TCP aceite pelo servidor origina uma instância desta classe,
+ * executada numa thread independente através de um ExecutorService.
+ *
+ * A classe implementa todo o protocolo de comunicação da aplicação,
+ * incluindo a fase de autenticação, processamento de comandos,
+ * envio de mensagens e transferência de ficheiros.
+ *
+ * A classe é responsável por:
+ * - Validar entradas dos utilizadores;
+ * - Aplicar restrições de segurança nos ficheiros recebidos;
+ * - Gerir timeouts de inatividade;
+ * - Registar eventos e operações através do sistema de logs;
+ * - Remover automaticamente clientes desligados.
+ *
+ * Cada cliente recebe um identificador único utilizado
+ * para efeitos de monitorização e auditoria nos logs.
+ *
+ * Esta classe implementa a interface Runnable para permitir
+ * a execução concorrente de múltiplos clientes em simultâneo.
+ *
+ * @author Grupo 2
+ * @version 3.0
+ */
 public class Atendente implements Runnable {
 
     private Socket socket;

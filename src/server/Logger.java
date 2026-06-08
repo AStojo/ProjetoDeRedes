@@ -1,25 +1,46 @@
 package server;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+/**
+ * Classe responsável pelo registo de eventos do sistema.
+ *
+ * Centraliza toda a informação de monitorização da aplicação,
+ * permitindo guardar eventos relevantes tanto na consola como
+ * num ficheiro de log persistente.
+ *
+ * Os registos incluem:
+ * - Arranque e encerramento do servidor;
+ * - Ligações e desconexões de clientes;
+ * - Comandos recebidos;
+ * - Operações realizadas;
+ * - Transferências de ficheiros;
+ * - Erros e exceções.
+ *
+ * Cada entrada de log contém:
+ * - Data e hora do evento;
+ * - Tipo de registo;
+ * - Identificador do cliente;
+ * - Descrição da operação.
+ *
+ * O ficheiro de log é atualizado automaticamente através
+ * de escrita sincronizada, garantindo consistência quando
+ * múltiplas threads escrevem em simultâneo.
+ *
+ * Esta classe disponibiliza apenas métodos estáticos,
+ * funcionando como um serviço global de logging para
+ * toda a aplicação.
+ *
+ * @author Grupo 2
+ * @version 3.0
+ */
+ class Logger {
 
-public class Logger {
-
-	private static final String PASTA = "Historíco";
 	private static final String FICHEIRO_LOG = "servidor.log";
     private static final DateTimeFormatter FORMATO =
         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    
- // garante que a pasta uploads existe antes de qualquer escrita
-    static {
-        File pasta = new File(PASTA);
-        if (!pasta.exists()) {
-            pasta.mkdirs();
-        }
-    }
 
     // log informativo — arranque, ligações, saídas, ficheiros
     public static void info(String clienteId, String mensagem) {
