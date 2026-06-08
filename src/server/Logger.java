@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 
 public class Logger {
 
-	private static final String PASTA = "uploads";
+	private static final String PASTA = "Historíco";
 	private static final String FICHEIRO_LOG = "servidor.log";
     private static final DateTimeFormatter FORMATO =
         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
