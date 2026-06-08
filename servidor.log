@@ -1,2 +1,32 @@
-2026-06-08 17:06:27 | INFO | servidor | cliente desligado por timeout
-2026-06-08 17:06:27 | INFO | servidor | cliente anonimo desligado
+2026-06-08 18:13:49 | INFO | servidor | Servidor iniciado na porta: 5002
+2026-06-08 18:13:49 | INFO | servidor | Servidor UDP à escuta na porta 6000
+2026-06-08 18:14:04 | INFO | servidor | Novo cliente ligado de/127.0.0.1
+2026-06-08 18:14:12 | INFO | servidor | UDP recebeu: DISCOVER de /192.168.68.51
+2026-06-08 18:14:12 | INFO | servidor | UDP respondeu: SERVER 192.168.68.51 5002
+2026-06-08 18:14:28 | INFO | servidor | Novo cliente ligado de/127.0.0.1
+2026-06-08 18:14:37 | INFO | servidor | ana entrou
+2026-06-08 18:14:45 | INFO | servidor | joao entrou
+2026-06-08 18:14:48 | INFO | servidor | joao : WHO
+2026-06-08 18:14:52 | INFO | servidor | joao : PING
+2026-06-08 18:14:52 | INFO | servidor | joao fez PING
+2026-06-08 18:14:55 | INFO | servidor | joao : TIME
+2026-06-08 18:14:55 | INFO | servidor | joao pediu TIME
+2026-06-08 18:14:58 | INFO | servidor | joao : HELP
+2026-06-08 19:00:00 | INFO | cliente=servidor | Servidor iniciado na porta: 5000
+2026-06-08 19:00:00 | INFO | cliente=servidor | Servidor UDP à escuta na porta 6000
+2026-06-08 19:00:11 | INFO | cliente=servidor | Novo cliente ligado de/127.0.0.1
+2026-06-08 19:00:11 | INFO | cliente=1 | nova ligacao de 127.0.0.1:59854
+2026-06-08 19:00:17 | INFO | cliente=servidor | ana entrou
+2026-06-08 19:00:17 | INFO | cliente=1 | ana ligado a partir de 127.0.0.1:59854
+2026-06-08 19:00:31 | RECV | cliente=1 | WHO
+2026-06-08 19:00:34 | RECV | cliente=1 | LIST
+2026-06-08 19:00:46 | RECV | cliente=1 | HELP
+2026-06-08 19:00:52 | RECV | cliente=1 | MSG ola
+2026-06-08 19:00:52 | INFO | cliente=1 | mensagem publica enviada: ola
+2026-06-08 19:01:01 | RECV | cliente=1 | PM alice ola alice
+2026-06-08 19:01:06 | RECV | cliente=1 | PING
+2026-06-08 19:01:06 | INFO | cliente=1 | ana fez PING
+2026-06-08 19:01:09 | RECV | cliente=1 | TIME
+2026-06-08 19:01:09 | INFO | cliente=1 | ana pediu TIME
+2026-06-08 19:01:12 | RECV | cliente=1 | QUIT
+2026-06-08 19:01:12 | INFO | cliente=1 | ana saiu com QUIT

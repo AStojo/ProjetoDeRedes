@@ -66,7 +66,7 @@ public class Cliente {
             System.out.println("Cliente terminado.");
 
         } catch (Exception e) {
-            System.out.println("400 ERRO: " + e.getMessage());
+            System.out.println("500 ERRO: " + e.getMessage());
         }
 
         sc.close();
@@ -77,7 +77,7 @@ public class Cliente {
         File ficheiro = new File(nomeFicheiro);
 
         if (!ficheiro.exists()) {
-            System.out.println("400 Erro: ficheiro nao encontrado.");
+            System.out.println("404 Erro: ficheiro nao encontrado.");
             return;
         }
 

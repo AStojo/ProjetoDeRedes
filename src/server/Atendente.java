@@ -17,9 +17,13 @@ public class Atendente implements Runnable {
     private PrintWriter out;
     private String username;
     private boolean saiuNormalmente = false;
+    private static int contadorId = 0;
+    private int clienteId;
+
 
     public Atendente(Socket socket) {
         this.socket = socket;
+        this.clienteId = ++contadorId;
     }
 
     @Override
@@ -27,6 +31,11 @@ public class Atendente implements Runnable {
         try {
             in  = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
             out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true);
+            
+         // logo no inicio do run(), antes do login
+            String enderecoRemoto = socket.getInetAddress().getHostAddress() 
+                + ":" + socket.getPort();
+            Logger.info(String.valueOf(clienteId), "nova ligacao de " + enderecoRemoto);
 
             // FASE DE LOGIN
             out.println("");
@@ -51,7 +60,8 @@ public class Atendente implements Runnable {
 
                 if (mensagem.equalsIgnoreCase("QUIT")) {
                     out.println("200 adeus");
-                    try { socket.close(); } catch (Exception ignored) {}
+                    try { socket.close(); 
+                    } catch (Exception ignored) {}
                     return;
                 }
 
@@ -76,6 +86,7 @@ public class Atendente implements Runnable {
                     username = nome;
                     GerirCliente.addClient(username, this);
                     Logger.log(username + " entrou");
+                    Logger.info(String.valueOf(clienteId), username + " ligado a partir de " + enderecoRemoto);
                     out.println("200 bem-vindo " + username);
                     break;
                 }
@@ -86,7 +97,7 @@ public class Atendente implements Runnable {
             // FASE PRINCIPAL
             while ((mensagem = in.readLine()) != null) {
                 mensagem = mensagem.trim();
-                Logger.log(username + " : " + mensagem);
+                Logger.recv(String.valueOf(clienteId), mensagem);
 
                 if (mensagem.equalsIgnoreCase("HELP")) {
                     tratarHelp();
@@ -126,15 +137,16 @@ public class Atendente implements Runnable {
 
         } catch (SocketTimeoutException e) {
             if (out != null) out.println("408 timeout");
-            Logger.log((username != null ? username : "cliente") + " desligado por timeout");
-
+            Logger.erro(String.valueOf(clienteId), "timeout - cliente desligado");  // ← falta isto
+        
         } catch (Exception e) {
-            Logger.log("Cliente desligado inesperadamente: " + e.getMessage());
-
+            Logger.erro(String.valueOf(clienteId), "erro inesperado: " + e.getMessage()); // ← falta isto
+        
         }finally {
             if (username != null && !saiuNormalmente) {
                 GerirCliente.removerCliente(username);
-                Logger.log(username + " desligado");
+                Logger.info(String.valueOf(clienteId), "sessao terminada"); // ← falta isto
+                
             } else if (username != null && saiuNormalmente) {
                 GerirCliente.removerCliente(username);
                 // nao regista de novo — ja foi registado no tratarQuit
@@ -192,7 +204,7 @@ public class Atendente implements Runnable {
 
         GerirCliente.transmissaoExceto("MSG " + username + ": " + texto, username);
         out.println("200 mensagem enviada");
-        Logger.log(username + " enviou mensagem publica: " + texto);
+        Logger.info(String.valueOf(clienteId), "mensagem publica enviada: " + texto);
     }
 
     // PM - enviar mensagem privada para um utilizador
@@ -222,7 +234,7 @@ public class Atendente implements Runnable {
 
         cliente.enviarMensagem("PM " + username + ": " + texto);
         out.println("200 mensagem privada enviada para " + destinatario);
-        Logger.log(username + " enviou mensagem privada para " + destinatario);
+        Logger.info(String.valueOf(clienteId), "mensagem privada para " + destinatario + ": " + texto);
     }
 
     // SEND - receber ficheiro do cliente
@@ -258,15 +270,15 @@ public class Atendente implements Runnable {
                 return;
             }
 
-            // 4. criar pasta uploads se nao existir
+         // 4. criar pasta uploads se nao existir
             File pasta = new File("uploads");
             if (!pasta.exists()) {
-                pasta.mkdir();
+                pasta.mkdirs();
             }
 
             // 5. ler conteudo e guardar ficheiro
             File ficheiro = new File("uploads/" + nomeFicheiro);
-            FileOutputStream fos = new FileOutputStream(ficheiro);
+            FileOutputStream fos = new FileOutputStream(ficheiro); //subistitui
 
             byte[] buffer = new byte[4096];
             long bytesRestantes = tamanhoFicheiro;
@@ -277,6 +289,8 @@ public class Atendente implements Runnable {
                 fos.write(buffer, 0, lido);
                 bytesRestantes -= lido;
             }
+            //RECEÇÃO DO FICHEIRO
+            Logger.info(String.valueOf(clienteId), "ficheiro recebido " + nomeFicheiro + " " + tamanhoFicheiro + " bytes");
 
             fos.close();
 
@@ -315,28 +329,27 @@ public class Atendente implements Runnable {
 
         GerirCliente.transmissaoExceto("*** " + nomeAntigo + " mudou o nome para " + username, username);
         out.println("200 nome alterado para " + username);
-        Logger.log(nomeAntigo + " mudou o nome para " + username);
+        Logger.info(String.valueOf(clienteId), nomeAntigo + " mudou o nome para " + username);
     }
 
     // PING - verificar se o servidor esta a responder
     private void tratarPing() {
         out.println("200 PONG");
-        Logger.log(username + " fez PING");
+        Logger.info(String.valueOf(clienteId), username + " fez PING"); 
     }
-
     // TIME - mostrar hora atual do servidor
     private void tratarTime() {
         String hora = java.time.LocalDateTime.now()
             .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         out.println("200 hora do servidor: " + hora);
-        Logger.log(username + " pediu TIME");
+        Logger.info(String.valueOf(clienteId), username + " pediu TIME");
     }
 
     // QUIT - desligar o cliente
     private void tratarQuit() {
         out.println("200 adeus");
-        saiuNormalmente = true; // ← marca que saiu com QUIT
-        Logger.log(username + " saiu");
+        saiuNormalmente = true;
+        Logger.info(String.valueOf(clienteId), username + " saiu com QUIT"); 
     }
     
     // metodo para enviar uma mensagem a este cliente

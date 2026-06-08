@@ -56,7 +56,7 @@ public class UdpClienteDescoberta {
             socketUDP.close();
 
         } catch (Exception e) {
-            System.out.println("Erro no cliente UDP: " + e.getMessage());
+            System.out.println("404 Erro no cliente UDP: " + e.getMessage());
         }
     }
 }
