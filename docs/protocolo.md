@@ -5,12 +5,10 @@
 
 ## Portas utilizadas
 
-| Protocolo | Porta | Uso |
-|-----------|-------|-----|
-| TCP | 5000 | Comunicação principal entre cliente e servidor |
-| UDP | 6000 | Descoberta automática do servidor na rede local |
-
----
+|  Protocolo   |     Porta   |              Uso                               |
+|--------------|-------------|------------------------------------------------|
+|      TCP     | Configurável| Comunicação principal entre cliente e servidor |
+|      UDP     |    6000     | Descoberta automática do servidor na rede local|
 
 ## Fase de ligação
 
@@ -22,14 +20,14 @@ Antes do registo, apenas são aceites os comandos:
 - HELP
 - QUIT
 
-Qualquer outro comando antes do registo recebe: `401 faca login primeiro`
-
----
+Qualquer outro comando antes do registo recebe: `401 faça login primeiro. Exemplo: NICK alice`
 
 ## Comandos disponíveis
 
 ### NICK
 Regista o utilizador no sistema.
+
+Exmp.:
 
 ```
 NICK alice
@@ -52,10 +50,46 @@ Regras:
 
 ### HELP
 Mostra a lista de comandos disponíveis.
+Exmp. antes do registro:
 
 ```
 HELP
 ```
+Resposta: 
+Comandos disponiveis antes do login:
+  NICK <nome>  - ex: NICK alice
+  HELP         - lista de comandos
+  QUIT         - sair
+
+Exmp. depois do registro:
+
+Resposta:
+------------------------------------------------------
+               GUIA DE FUNCIONAMENTO 
+-------------------------------------------------
+COMANDOS:
+  WHO                        - Lista utilizadores ativos
+  MSG <texto>                - Envia mensagem publica
+                               ex: MSG ola a todos
+  PM <nick> <texto>          - Envia mensagem privada
+                               ex: PM alice ola
+  SEND <ficheiro>            - Envia ficheiro para o servidor
+                               ex: SEND foto.jpg
+  NICK <novo_nome>           - Altera o teu username
+                               ex: NICK novo_nome
+  PING                       - Verifica ligacao ao servidor
+  TIME                       - Devolve o tempo atual do servidor
+  QUIT                       - Desconecta a ligacao
+------------------------------------------------------
+CODIGOS DE RESPOSTA:
+  200 - Operacao realizada com sucesso
+  400 - Pedido invalido
+  401 - Cliente ainda nao registado
+  404 - Recurso ou utilizador nao encontrado
+  408 - Timeout
+  409 - Nome ja utilizado
+  500 - Erro interno do servidor
+------------------------------------------------------
 
 ---
 
@@ -131,8 +165,9 @@ Respostas:
 ```
 
 Protocolo binário utilizado:
+
 ```
-[int nameLen][nameBytes UTF-8][long fileLen][fileBytes]
+[int nameLen][nameBytes_UTF-8][long fileLen][fileBytes]
 ```
 
 Limites:
@@ -216,7 +251,7 @@ DISCOVER
 
 Resposta do servidor:
 ```
-SERVER 192.168.68.53 5000
+SERVER 192.168.68.53 (Porta indicada)
 ```
 
 Se nenhum servidor responder em 3 segundos:
@@ -240,18 +275,9 @@ Nenhum servidor encontrado na rede.
 
 ---
 
-## Framing
-
-### Comandos de texto
-Cada comando é uma linha terminada por `\n`:
-```
-WHO\n
-MSG ola\n
-QUIT\n
-```
-
 ### Ficheiros binários
 Protocolo com comprimento explícito:
+
 ```
 [int nameLen 4 bytes][nameBytes UTF-8][long fileLen 8 bytes][fileBytes]
 ```

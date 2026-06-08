@@ -73,15 +73,6 @@ public class GerirCliente {
     }
 
     /**
-     * Metodo Transmissao - envia para todos os clientes
-     */
-    public static void transmissao(String mensagem) {
-        for (Atendente a : clientes.values()) {
-            a.enviarMensagem(mensagem);
-        }
-    }
-
-    /**
      * Metodo TransmissaoExceto - envia para todos EXCETO o remetente
      */
     public static void transmissaoExceto(String mensagem, String remetente) {
