@@ -1,8 +1,11 @@
-package server;
+package udp;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+
+import server.Logger;
+import server.Servidor;
  
 public class UdpServidorDescoberta {
  

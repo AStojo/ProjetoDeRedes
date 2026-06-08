@@ -6,6 +6,8 @@ import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import udp.UdpServidorDescoberta;
+
 public class Servidor {
 
 private static int porta;

@@ -18,10 +18,10 @@ public class Cliente {
 
         Scanner sc = new Scanner(System.in);
 
-        System.out.println("Host do servidor (ex.: 127.0.0.1): ");
+        System.out.println("IP/Host do servidor: ");
         String host = sc.nextLine();
 
-        System.out.println("Porta do servidor (ex.: 5000): ");
+        System.out.println("Porta do servidor: ");
         int porta = Integer.parseInt(sc.nextLine());
 
         try {
