@@ -154,7 +154,6 @@ public class Atendente implements Runnable {
                     break;
 
                 } else if (mensagem.isEmpty()) {
-                    // ignorar linhas vazias
 
                 } else {
                     out.println("400 comando invalido. Escreve HELP para ver os comandos");
@@ -163,19 +162,18 @@ public class Atendente implements Runnable {
 
         } catch (SocketTimeoutException e) {
             if (out != null) out.println("408 timeout");
-            Logger.erro(String.valueOf(clienteId), "timeout - cliente desligado");  // ← falta isto
+            Logger.erro(String.valueOf(clienteId), "timeout - cliente desligado");  
         
         } catch (Exception e) {
-            Logger.erro(String.valueOf(clienteId), "erro inesperado: " + e.getMessage()); // ← falta isto
+            Logger.erro(String.valueOf(clienteId), "erro inesperado: " + e.getMessage()); 
         
         }finally {
             if (username != null && !saiuNormalmente) {
                 GerirCliente.removerCliente(username);
-                Logger.info(String.valueOf(clienteId), "sessao terminada"); // ← falta isto
+                Logger.info(String.valueOf(clienteId), "sessao terminada"); 
                 
             } else if (username != null && saiuNormalmente) {
                 GerirCliente.removerCliente(username);
-                // nao regista de novo — ja foi registado no tratarQuit
             } else {
                 Logger.log("cliente anonimo desligado");
             }
@@ -304,7 +302,7 @@ public class Atendente implements Runnable {
 
             // 5. ler conteudo e guardar ficheiro
             File ficheiro = new File("uploads/" + nomeFicheiro);
-            FileOutputStream fos = new FileOutputStream(ficheiro); //subistitui
+            FileOutputStream fos = new FileOutputStream(ficheiro); 
 
             byte[] buffer = new byte[4096];
             long bytesRestantes = tamanhoFicheiro;
